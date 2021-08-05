@@ -1,0 +1,58 @@
+arch:
+    max_epochs: 30
+checkpoint:
+    save_top_k: 5
+    monitor : 'abs_rel_gt'
+model:
+    name: 'SelfSupModelDepth'
+    loss:
+        upsample_depth_maps: True
+        depth_reconstruction_weight : 0.1
+        depth_reconstruction_ssim_weight : 0.15
+    optimizer:
+        name: 'Adam'
+        depth:
+            lr: 0.0002
+        depth2:
+            lr: 0.0002
+        pose:
+            lr: 0.0002
+    scheduler:
+        name: 'StepLR'
+        step_size: 30 
+        gamma: 0.9
+    depth_net:
+        name: 'DepthResNet'
+        version: '18pt'
+        checkpoint_path: '/home/sj/src/packnet-sfm/result/default_config-overfit_custom_resnet18-2021.02.10-17h59m56s/epoch=16_custom-val_files-abs_rel_gt=0.126.ckpt'
+        #checkpoint_path: '/home/sj/src/packnet-sfm/result/default_config-overfit_custom-2021.01.29-20h29m34s/epoch=04_custom-val_files-loss=0.000.ckpt'
+    depth_net2:
+        name: 'DepthResNet'
+        version: '18pt'        
+    pose_net:
+        name: 'PoseResNet'
+        version: '18pt'
+    params:
+        min_depth: 1.0
+        max_depth: 255.0
+datasets:
+    augmentation:
+        image_shape: (256, 256)
+    train:
+        batch_size: 8
+        dataset: ['Custom']
+        path: ['data/datasets/custom']
+        split: ['train_files.txt']
+        depth_type: ['']
+        repeat: [1]
+    validation:
+        batch_size: 8
+        dataset: ['Custom']
+        path: ['data/datasets/custom']
+        split: ['val_files.txt']
+        depth_type: ['']
+    test:
+        dataset: ['Custom']
+        path: ['data/datasets/custom']
+        split: ['val_files.txt']
+        depth_type: ['']

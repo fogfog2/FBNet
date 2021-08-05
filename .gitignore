@@ -1,0 +1,8 @@
+/.vscode
+/Makefile
+/docker
+/docs
+/log.txt
+/logs
+/result
+/train_packnet.sh
