@@ -8,11 +8,8 @@ from functools import partial
 from packnet_sfm.networks.depth.cmt2 import CMT, CMT_Ti, CMT_B
 
 from packnet_sfm.networks.layers.resnet.depth_decoder import DepthDecoder
-
 from packnet_sfm.networks.layers.resnet.layers import disp_to_depth
 import torch.nn.functional as F
-
-
 
 
 class DepthCMT2(nn.Module):

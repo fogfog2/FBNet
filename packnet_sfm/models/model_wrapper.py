@@ -410,7 +410,7 @@ def setup_depth_net(config, prepared, **kwargs):
         args={**config, **kwargs},
     )
 
-    if config.name == 'DepthSwin':
+    if 'DepthSwin' in config.name:
         if not prepared and config.checkpoint_path is not '':
             depth_net = load_swin_network(depth_net, config.checkpoint_path,
                                     ['depth_net', 'disp_network'])

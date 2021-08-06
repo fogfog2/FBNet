@@ -20,7 +20,7 @@ model:
         step_size: 10
         gamma: 0.9
     depth_net:
-        name: 'DepthSwin'
+        name: 'DepthSwin2'
         embed_dim: 96
         depths: [2,2,6,2]
         num_heads: [3,6,12,24]

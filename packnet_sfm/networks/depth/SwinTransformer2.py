@@ -494,7 +494,8 @@ class SwinTransformer(nn.Module):
                  patch_norm=True,
                  out_indices=(0, 1, 2, 3),
                  frozen_stages=-1,
-                 use_checkpoint=False):
+                 use_checkpoint=False,
+                 init_dim = 64):
         super().__init__()
 
         self.pretrain_img_size = pretrain_img_size
@@ -504,14 +505,15 @@ class SwinTransformer(nn.Module):
         self.patch_norm = patch_norm
         self.out_indices = out_indices
         self.frozen_stages = frozen_stages
+        self.init_dim = init_dim
 
         # split image into non-overlapping patches
         self.patch_embed = PatchEmbed(
             patch_size=patch_size, in_chans=in_chans, embed_dim=embed_dim,
             norm_layer=norm_layer if self.patch_norm else None)
-        # self.patch_embed2 = PatchEmbed(
-        #     patch_size=2, in_chans=in_chans, embed_dim=48,
-        #     norm_layer=norm_layer if self.patch_norm else None)
+        self.patch_embed2 = PatchEmbed(
+            patch_size=2, in_chans=in_chans, embed_dim=init_dim,
+            norm_layer=norm_layer if self.patch_norm else None)
 
         # absolute position embedding
         if self.ape:
@@ -546,23 +548,23 @@ class SwinTransformer(nn.Module):
                 use_checkpoint=use_checkpoint)
             self.layers.append(layer)
 
-        # self.layermy = BasicLayer(
-        #         dim=int(48),
-        #         depth=2,
-        #         num_heads=3,
-        #         window_size=7,
-        #         mlp_ratio=mlp_ratio,
-        #         qkv_bias=qkv_bias,
-        #         qk_scale=qk_scale,
-        #         drop=drop_rate,
-        #         attn_drop=attn_drop_rate,
-        #         drop_path=dpr[0:2],
-        #         norm_layer=norm_layer,
-        #         downsample=PatchMerging if (0 < self.num_layers - 1) else None,
-        #         use_checkpoint=use_checkpoint)
+        self.layermy = BasicLayer(
+                dim=int(init_dim),
+                depth=2,
+                num_heads=3,
+                window_size=7,
+                mlp_ratio=mlp_ratio,
+                qkv_bias=qkv_bias,
+                qk_scale=qk_scale,
+                drop=drop_rate,
+                attn_drop=attn_drop_rate,
+                drop_path=dpr[0:2],
+                norm_layer=norm_layer,
+                downsample=PatchMerging if (0 < self.num_layers - 1) else None,
+                use_checkpoint=use_checkpoint)
         num_features = [int(embed_dim * 2 ** i) for i in range(self.num_layers)]
         self.num_features = num_features
-
+        self.init_norm = norm_layer(init_dim)
         # add a norm layer for each output
         for i_layer in out_indices:
             layer = norm_layer(num_features[i_layer])
@@ -617,9 +619,9 @@ class SwinTransformer(nn.Module):
     def forward(self, x):
         """Forward function."""
 
-        #x = self.patch_embed2(x)
+        x = self.patch_embed2(x)
 
-        x = self.patch_embed(x)
+        #x = self.patch_embed(x)
 
 
         Wh, Ww = x.size(2), x.size(3)
@@ -630,8 +632,13 @@ class SwinTransformer(nn.Module):
         else:
             x = x.flatten(2).transpose(1, 2)
         x = self.pos_drop(x)
-        #x_out, H, W, x, Wh, Ww= self.layermy(x,Wh,Ww)
+        x_out, H, W, x, Wh, Ww= self.layermy(x,Wh,Ww)
+                
+        x_out = self.init_norm(x_out)
+        out = x_out.view(-1, H, W, self.init_dim).permute(0, 3, 1, 2).contiguous()
         outs = []
+        outs.append(out)
+        
         for i in range(self.num_layers):
             layer = self.layers[i]
             x_out, H, W, x, Wh, Ww = layer(x, Wh, Ww)
