@@ -1,6 +1,6 @@
 This ropository is referenced from https://github.com/TRI-ML/packnet-sfm
 
-add transformer backbone 
+add transformer backbone for monoculdar depth estimation
 
             swin 
             https://arxiv.org/abs/2103.14030
