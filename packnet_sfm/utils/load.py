@@ -171,9 +171,7 @@ def load_swin_network(network, path, prefixes=''):
     ----------
     network : nn.Module
         Network that will receive the pretrained weights
-    path : str
-        File containing a 'state_dict' key with pretrained network weights
-    prefixes : str or list of str
+    path : strload_swin_network
         Layer name prefixes to consider when loading the network
 
     Returns
@@ -220,6 +218,61 @@ def load_swin_network(network, path, prefixes=''):
           pcolor('tensors', base_color, attrs=attrs))
     return network
 
+def load_cswin_network(network, path, prefixes=''):
+    """
+    Loads a pretrained network
+
+    Parameters
+    ----------
+    network : nn.Module
+        Network that will receive the pretrained weights
+    path : strload_swin_network
+        Layer name prefixes to consider when loading the network
+
+    Returns
+    -------
+    network : nn.Module
+        Updated network with pretrained weights
+    """
+    prefixes = make_list(prefixes)
+    # If path is a string
+    if is_str(path):
+        #saved_state_dict = torch.load(path, map_location='cpu')
+        saved_state_dict = torch.load(path, map_location='cpu')['state_dict_ema']
+        if path.endswith('.pth.tar'):
+            saved_state_dict = backwards_state_dict(saved_state_dict)
+    # If state dict is already provided
+    else:
+        saved_state_dict = path
+    # Get network state dict
+    network_state_dict = network.state_dict()
+
+    updated_state_dict = OrderedDict()
+    n, n_total = 0, len(network_state_dict.keys())
+    for key, val in saved_state_dict.items():
+        swin_key = 'cswin.'+key
+        if swin_key in network_state_dict.keys():
+            if same_shape(val.shape, network_state_dict[swin_key].shape):
+                updated_state_dict[swin_key] = val
+                n += 1
+
+        # for prefix in prefixes:
+        #     prefix = prefix + '.'
+        #     if prefix in key:
+        #         idx = key.find(prefix) + len(prefix)
+        #         key = key[idx:]
+        #         if key in network_state_dict.keys() and \
+        #                 same_shape(val.shape, network_state_dict[key].shape):
+        #             updated_state_dict[key] = val
+        #             n += 1
+
+    network.load_state_dict(updated_state_dict, strict=False)
+    base_color, attrs = 'cyan', ['bold', 'dark']
+    color = 'green' if n == n_total else 'yellow' if n > 0 else 'red'
+    print0(pcolor('###### Pretrained {} loaded:'.format(prefixes[0]), base_color, attrs=attrs) +
+          pcolor(' {}/{} '.format(n, n_total), color, attrs=attrs) +
+          pcolor('tensors', base_color, attrs=attrs))
+    return network
 
 def backwards_state_dict(state_dict):
     """

@@ -13,7 +13,7 @@ from packnet_sfm.utils.depth import inv2depth, post_process_inv_depth, compute_d
 from packnet_sfm.utils.horovod import print0, world_size, rank, on_rank_0
 from packnet_sfm.utils.image import flip_lr
 from packnet_sfm.utils.load import load_class, load_class_args_create, \
-    load_network, load_swin_network, filter_args
+    load_network, load_swin_network,load_cswin_network, filter_args
 from packnet_sfm.utils.logging import pcolor
 from packnet_sfm.utils.reduce import all_reduce_metrics, reduce_dict, \
     create_dict, average_loss_and_metrics
@@ -413,6 +413,10 @@ def setup_depth_net(config, prepared, **kwargs):
     if 'DepthSwin' in config.name:
         if not prepared and config.checkpoint_path is not '':
             depth_net = load_swin_network(depth_net, config.checkpoint_path,
+                                    ['depth_net', 'disp_network'])
+    elif 'CSwin' in config.name:
+        if not prepared and config.checkpoint_path is not '':
+            depth_net = load_cswin_network(depth_net, config.checkpoint_path,
                                     ['depth_net', 'disp_network'])
     else:
         if not prepared and config.checkpoint_path is not '':
