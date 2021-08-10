@@ -371,7 +371,7 @@ class CSWinTransformer(nn.Module):
                 x = checkpoint.checkpoint(blk, x)
             else:
                 x = blk(x)
-        x_out0 = x.view(B, W, H, -1).permute(0, 3, 1, 2).contiguous()        
+        x_out0 = x.view(B, W, H, -1).permute(0, 3, 2, 1).contiguous()        
         outs.append(x_out0) # w/4, h/4 (embeding) [b, w/4 * h/4 , c]
 
 
@@ -385,7 +385,7 @@ class CSWinTransformer(nn.Module):
 
         W = W//2 
         H = H//2
-        x_out1 = x.view(B, W, H, -1).permute(0, 3, 1, 2).contiguous()          
+        x_out1 = x.view(B, W, H, -1).permute(0, 3, 2, 1).contiguous()          
         outs.append(x_out1) # w/4. h/4 (stage 1)
 
         
@@ -401,7 +401,7 @@ class CSWinTransformer(nn.Module):
 
             W = W//2 
             H = H//2
-            x_out = x.view(B, W, H, -1).permute(0, 3, 1, 2).contiguous()        
+            x_out = x.view(B, W, H, -1).permute(0, 3, 2, 1).contiguous()        
             outs.append(x_out) 
 
         #x = self.norm(x)
