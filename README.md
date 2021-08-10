@@ -30,4 +30,4 @@ vs code args
             "args": [  "configs/overfit_kitti_swin_T.yaml"],
 
             "program": "${workspaceFolder}/scripts/eval_origin.py",             
-            "args": ["path.ckpt"]
+            "args": [""--checkpoint=/home/path.ckpt"]
