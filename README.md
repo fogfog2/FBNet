@@ -22,7 +22,12 @@ add fbnet
 
 vs code args
 
-            "program": "${workspaceFolder}/scripts/train_origin.py",
-            "args": [  "configs/overfit_kitti_swin_T.yaml"],
+
             "cwd": "${workspaceFolder}",
             "env": {"PYTHONPATH": "${cwd}" }
+            
+            "program": "${workspaceFolder}/scripts/train_origin.py",
+            "args": [  "configs/overfit_kitti_swin_T.yaml"],
+
+            "program": "${workspaceFolder}/scripts/eval_origin.py",             
+            "args": [""--checkpoint=/home/path.ckpt"]
