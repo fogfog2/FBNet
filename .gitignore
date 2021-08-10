@@ -8,3 +8,4 @@
 /train_packnet.sh
 /depth
 *.pyc
+**/__pycache__/
