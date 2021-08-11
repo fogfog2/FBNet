@@ -275,8 +275,9 @@ class CSWinTransformer(nn.Module):
             nn.LayerNorm(embed_dim)
         )
         self.stage0_conv_embed = nn.Sequential(
-            nn.Conv2d(in_chans, int(embed_dim/2), 3, 2, 1),
-            nn.Conv2d(int(embed_dim/2), int(embed_dim/2), 3, 1, 1),
+            # nn.Conv2d(in_chans, int(embed_dim/2), 3, 2, 1),
+            # nn.Conv2d(int(embed_dim/2), int(embed_dim/2), 3, 1, 1),
+            nn.Conv2d(in_chans, int(embed_dim/2), (7,7), 2, (3, 3)),
 
             Rearrange('b c h w -> b (h w) c', h = img_height//2, w = img_width//2),
             nn.LayerNorm(int(embed_dim/2))
@@ -372,7 +373,7 @@ class CSWinTransformer(nn.Module):
             else:
                 x = blk(x)
         x_out0 = x.view(B, W, H, -1).permute(0, 3, 2, 1).contiguous()        
-        outs.append(x_out0) # w/4, h/4 (embeding) [b, w/4 * h/4 , c]
+        outs.append(x_out0) # w/2, h/2 stage 0 
 
 
 
