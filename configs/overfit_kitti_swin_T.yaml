@@ -1,5 +1,5 @@
 arch:
-    max_epochs: 100
+    max_epochs: 51
 checkpoint:
     save_top_k: 5
     monitor : 'abs_rel_gt'
@@ -29,7 +29,6 @@ model:
         drop_path_rate: 0.3
         patch_norm: True
         use_checkpoint: False
-        checkpoint_path: '/home/sj/src/Swin-Transformer-Semantic-Segmentation/pretrained/swin_tiny_patch4_window7_224.pth'
         version: '18pt'    
     pose_net:
         name: 'PoseResNet'
