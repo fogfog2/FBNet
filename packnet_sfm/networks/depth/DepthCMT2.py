@@ -22,7 +22,7 @@ class DepthCMT2(nn.Module):
         self.embed_dim= embed_dim    
         self.channels = 256
         self.in_channels=[self.embed_dim, self.embed_dim *2 , self.embed_dim*4, self.embed_dim * 8]      
-        self.de_channels=[64, self.embed_dim, self.embed_dim *2 , self.embed_dim*4, self.embed_dim * 8]      
+        self.de_channels=[16, self.embed_dim, self.embed_dim *2 , self.embed_dim*4, self.embed_dim * 8]      
 
         self.cmt = CMT_Ti(in_channels = 3, input_size = 256, embed_dim= 46)
         #self.cmt = CMT_B(in_channels = 3, input_size = 256, embed_dim= 76)

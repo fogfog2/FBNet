@@ -21,7 +21,7 @@ model:
         gamma: 0.9
     depth_net:
         name: 'DepthCMT2'
-        embed_dim: 76
+        embed_dim: 46
     pose_net:
         name: 'PoseResNet'
         version: '18pt'
