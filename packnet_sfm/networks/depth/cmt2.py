@@ -70,13 +70,13 @@ class CMT(t.nn.Module):
         # 1. Stem
         self.stem = Stem(in_channels = in_channels, out_channels = stem_channels, stride = 2)
 
-        self.conv1 = t.nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = t.nn.BatchNorm2d(64)
+        self.conv1 = t.nn.Conv2d(in_channels, stem_channels, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = t.nn.BatchNorm2d(stem_channels)
         self.relu = t.nn.ReLU(inplace=True)
 
         # 2. Patch Aggregation 1
         #self.pa1 = PatchAggregation(in_channels = stem_channels, out_channels = pa_channelses[0], kernel_size=3, stride = 1, padding = 1)
-        self.pa1 = PatchAggregation(in_channels = 16, out_channels = pa_channelses[0], kernel_size=2, stride = 2, padding = 0)
+        self.pa1 = PatchAggregation(in_channels = stem_channels, out_channels = pa_channelses[0], kernel_size=2, stride = 2, padding = 0)
         self.pa2 = PatchAggregation(in_channels = cmt_channelses[0], out_channels = pa_channelses[1])
         self.pa3 = PatchAggregation(in_channels = cmt_channelses[1], out_channels = pa_channelses[2])
         self.pa4 = PatchAggregation(in_channels = cmt_channelses[2], out_channels = pa_channelses[3])
@@ -150,14 +150,14 @@ class CMT(t.nn.Module):
         self.features = []
         
         # 1. Stem
-        x = self.stem(x)
-        self.features.append(x)
+        # x = self.stem(x)
+        # self.features.append(x)
 
         # 1-2. relu
-        # x = (x - 0.45) / 0.225
-        # x = self.conv1(x)
-        # x = self.bn1(x)
-        # self.features.append(self.relu(x))
+        x = (x - 0.45) / 0.225
+        x = self.conv1(x)
+        x = self.bn1(x)
+        self.features.append(self.relu(x))
 
 
         # 2. PA1 + CMTb1
@@ -199,7 +199,7 @@ class CMT(t.nn.Module):
 class CMT_Ti(t.nn.Module):
     """Define CMT-Ti model"""
 
-    def __init__(self, in_channels = 3, input_size = 224, embed_dim = 46):
+    def __init__(self, in_channels = 3, input_size = 224, embed_dim = 46, stem_channels = 16):
         """
         Args :
             --in_channels: default is 3
@@ -209,7 +209,7 @@ class CMT_Ti(t.nn.Module):
         super(CMT_Ti, self).__init__()
 
         self.cmt_ti = CMT(in_channels = in_channels,
-                          stem_channels = 16,
+                          stem_channels = stem_channels,
                           cmt_channelses = [embed_dim, embed_dim *2 , embed_dim*4, embed_dim * 8],
                           pa_channelses = [embed_dim, embed_dim *2 , embed_dim*4, embed_dim * 8],
                           R = 3.6,
