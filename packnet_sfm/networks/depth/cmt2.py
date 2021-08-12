@@ -68,7 +68,7 @@ class CMT(t.nn.Module):
 
 
         # 1. Stem
-        self.stem = Stem(in_channels = in_channels, out_channels = stem_channels, stride = 1)
+        self.stem = Stem(in_channels = in_channels, out_channels = stem_channels, stride = 2)
 
         self.conv1 = t.nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = t.nn.BatchNorm2d(64)
@@ -76,7 +76,7 @@ class CMT(t.nn.Module):
 
         # 2. Patch Aggregation 1
         #self.pa1 = PatchAggregation(in_channels = stem_channels, out_channels = pa_channelses[0], kernel_size=3, stride = 1, padding = 1)
-        self.pa1 = PatchAggregation(in_channels = 64, out_channels = pa_channelses[0], kernel_size=2, stride = 2, padding = 0)
+        self.pa1 = PatchAggregation(in_channels = 16, out_channels = pa_channelses[0], kernel_size=2, stride = 2, padding = 0)
         self.pa2 = PatchAggregation(in_channels = cmt_channelses[0], out_channels = pa_channelses[1])
         self.pa3 = PatchAggregation(in_channels = cmt_channelses[1], out_channels = pa_channelses[2])
         self.pa4 = PatchAggregation(in_channels = cmt_channelses[2], out_channels = pa_channelses[3])
@@ -146,15 +146,19 @@ class CMT(t.nn.Module):
 
     def forward(self, x):
 
-        # 1. Stem
-        #x_stem = self.stem(x)
+        
         self.features = []
+        
+        # 1. Stem
+        x = self.stem(x)
+        self.features.append(x)
 
-        x = (x - 0.45) / 0.225
-        x = self.conv1(x)
-        x = self.bn1(x)
+        # 1-2. relu
+        # x = (x - 0.45) / 0.225
+        # x = self.conv1(x)
+        # x = self.bn1(x)
+        # self.features.append(self.relu(x))
 
-        self.features.append(self.relu(x))
 
         # 2. PA1 + CMTb1
         x_pa1 = self.pa1(x)
