@@ -22,7 +22,7 @@ class DepthCSwin(nn.Module):
         
         self.embed_dim= embed_dim    
         self.in_channels=[self.embed_dim, self.embed_dim *2 , self.embed_dim*4, self.embed_dim * 8]         
-        init_dim = self.embed_dim/2
+        init_dim = self.embed_dim
         self.de_channels=[init_dim, self.embed_dim, self.embed_dim *2 , self.embed_dim*4, self.embed_dim * 8]      
 
         #

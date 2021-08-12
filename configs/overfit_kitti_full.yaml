@@ -33,7 +33,7 @@ datasets:
         depth_type: ['velodyne']
         repeat: [1]
     validation:
-        batch_size: 8
+        batch_size: 1
         dataset: ['KITTI']
         path: ['/home/sj/kitti']
         split: ['eigen_val_files.txt']

@@ -282,6 +282,10 @@ class CSWinTransformer(nn.Module):
             Rearrange('b c h w -> b (h w) c', h = img_height//2, w = img_width//2),
             nn.LayerNorm(int(embed_dim/2))
         )
+
+        self.conv1 = torch.nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = torch.nn.BatchNorm2d(64)
+        self.relu = torch.nn.ReLU(inplace=True)
         self.depth =depth
 
         curr_dim = embed_dim
@@ -295,7 +299,7 @@ class CSWinTransformer(nn.Module):
                 drop_path=dpr[i], norm_layer=norm_layer)
             for i in range(depth[0])])
 
-        self.merge0 = Merge_Block(dim = int(curr_dim/2), dim_out = curr_dim, input_width = img_width//2 , input_height = img_height//2)
+        self.merge0 = Merge_Block(dim = int(curr_dim), dim_out = curr_dim, input_width = img_width//2 , input_height = img_height//2)
 
         self.stage1 = nn.ModuleList(
             [CSWinBlock(
@@ -362,20 +366,25 @@ class CSWinTransformer(nn.Module):
         H = x.shape[2]
 
         #x = self.stage1_conv_embed(x) # w,h -> 1/4
-        x = self.stage0_conv_embed(x) # w,h -> 1/2
+        #x = self.stage0_conv_embed(x) # w,h -> 1/2
         outs = []
 
         W = W//2 
         H = H//2
-        for blk in self.stage0:
-            if self.use_chk:
-                x = checkpoint.checkpoint(blk, x)
-            else:
-                x = blk(x)
-        x_out0 = x.view(B, W, H, -1).permute(0, 3, 2, 1).contiguous()        
+        # for blk in self.stage0:
+        #     if self.use_chk:
+        #         x = checkpoint.checkpoint(blk, x)
+        #     else:
+        #         x = blk(x)
+        
+        x = (x - 0.45) / 0.225
+        x = self.conv1(x)
+        x = self.bn1(x)
+        
+        x_out0 = x.view(B, H, W, -1).permute(0, 3, 1, 2).contiguous()        
         outs.append(x_out0) # w/2, h/2 stage 0 
 
-
+        x = x.view(B, H* W, -1) 
 
         for blk in self.stage1:
             x = self.merge0(x) #merge w,h -> 1/2 
@@ -386,7 +395,7 @@ class CSWinTransformer(nn.Module):
 
         W = W//2 
         H = H//2
-        x_out1 = x.view(B, W, H, -1).permute(0, 3, 2, 1).contiguous()          
+        x_out1 = x.view(B, H, W, -1).permute(0, 3, 1, 2).contiguous()          
         outs.append(x_out1) # w/4. h/4 (stage 1)
 
         
@@ -402,7 +411,7 @@ class CSWinTransformer(nn.Module):
 
             W = W//2 
             H = H//2
-            x_out = x.view(B, W, H, -1).permute(0, 3, 2, 1).contiguous()        
+            x_out = x.view(B, H, W, -1).permute(0, 3, 1, 2).contiguous()        
             outs.append(x_out) 
 
         #x = self.norm(x)
