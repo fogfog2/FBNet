@@ -1,5 +1,5 @@
 arch:
-    max_epochs: 100
+    max_epochs: 51
 checkpoint:
     save_top_k: 5
     monitor : 'abs_rel_gt'
