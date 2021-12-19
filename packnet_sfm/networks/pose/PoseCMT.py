@@ -32,7 +32,7 @@ class PoseCMT(nn.Module):
         assert num_layers in [18, 34, 50], 'ResNet version {} not available'.format(num_layers)
 
         self.embed_dim = 46
-        self.stem_channel = 64
+        self.stem_channel = 16
         self.encoder = CMT_Ti(in_channels = 6, input_size = 256, embed_dim= 46, stem_channels = self.stem_channel)
         self.de_channels=[self.stem_channel, self.embed_dim, self.embed_dim *2 , self.embed_dim*4, self.embed_dim * 8]      
         self.decoder = PoseDecoder(self.de_channels, num_input_features=1, num_frames_to_predict_for=2)

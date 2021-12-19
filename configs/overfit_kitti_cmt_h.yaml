@@ -19,7 +19,7 @@ model:
         name: 'StepLR'
         gamma: 0.9
     depth_net:
-        name: 'DepthCMT'
+        name: 'DepthCMT_H'
         embed_dim: 46
     pose_net:
         name: 'PoseResNet'
