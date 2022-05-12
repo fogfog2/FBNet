@@ -16,9 +16,7 @@ add transformer backbone for monoculdar depth estimation
 
 
 add fbnet 
-
-            https://www.mdpi.com/1424-8220/21/8/2691
-
+ - [fbnet]
 
 vs code args
 
@@ -31,3 +29,7 @@ vs code args
 
             "program": "${workspaceFolder}/scripts/eval_origin.py",             
             "args": [""--checkpoint=/home/path.ckpt"]
+
+
+
+[fbnet]: <https://www.mdpi.com/1424-8220/21/8/2691>
